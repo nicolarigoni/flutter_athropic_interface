@@ -1,0 +1,4 @@
+enum CompletionType {
+  message,
+  error,
+}

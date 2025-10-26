@@ -1,0 +1,13 @@
+targets:
+  $default:
+    builders:
+      flutter_athropic_interface|tool_generator:
+        enabled: true
+
+builders:
+  tool_generator:
+    import: "package:flutter_athropic_interface/src/generator/tool_generator.dart"
+    builder_factories: ["toolGeneratorBuilder"]
+    build_extensions: { ".dart": [".tool.g.dart"] }
+    auto_apply: dependents
+    build_to: source

@@ -1,0 +1,4 @@
+enum MessageRoleType {
+  user,
+  assistant,
+}
