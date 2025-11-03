@@ -1,8 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter_athropic_interface/flutter_athropic_interface.dart';
-import 'package:flutter_athropic_interface/src/models/completion_type.dart';
-import 'package:flutter_athropic_interface/src/models/content_type.dart';
 
 enum StopReasonType {
   endTurn('end_turn', 'the model reached a natural stopping point', false),
@@ -34,6 +32,12 @@ class CompletionResponseDto {
   final StopReasonType stopReason;
   final String? stopSequence;
   final UsageData? usage;
+
+  Message convertToMessage() {
+    final messsageContent = MessageContent(blocks: content.map((e) => e.convertToBlock()).toList());
+    final message = Message(role: role, content: messsageContent);
+    return message;
+  }
 
   CompletionResponseDto(
     this.id,
@@ -67,12 +71,31 @@ class ContentData {
   static const String jsonProperty = 'content';
 
   final ContentType type;
+
+  /// Questa proprietà rappresenta la parte della risposta che arriva dal tipo: thinking
   final String thinking;
+
+  /// Questa proprietà rappresenta la parte della risposta che arriva dal tipo: thinking
   final String signature;
+
+  /// Questa proprietà rappresenta la parte della risposta che arriva dal tipo: tool_use
   final String id;
+
+  /// Questa proprietà rappresenta la parte della risposta che arriva dal tipo: tool_use
   final String name;
+
+  /// Questa proprietà rappresenta la parte della risposta che arriva dal tipo: text
   final String text;
-  final InputData? input;
+
+  /// Questa proprietà rappresenta la parte della risposta che arriva dal tipo: tool_use
+  final Map<String, dynamic> inputData;
+
+  /// Questa proprietà rappresenta la parte della risposta che arriva dal tipo: tool_result
+  final String toolUseId;
+
+  /// Questa proprietà rappresenta la parte della risposta che arriva dal tipo: tool_result
+  /// deve essere obbligatoriamente un json encodato
+  final String content;
 
   ContentData(
     this.type,
@@ -81,8 +104,25 @@ class ContentData {
     this.id,
     this.name,
     this.text,
-    this.input,
+    this.inputData,
+    this.toolUseId,
+    this.content,
   );
+
+  Block convertToBlock() {
+    switch (type) {
+      case ContentType.text:
+        return TextBlock(text: text);
+      case ContentType.toolUse:
+        return ToolUseBlock(id: id, name: name, input: inputData);
+      case ContentType.thinking:
+        return ThinkingBlock(thinking: thinking, signature: signature);
+      case ContentType.toolResult:
+        return ToolResultBlock(toolUseId: toolUseId, content: content.isEmpty ? jsonDecode(content) : {});
+      default:
+        return TextBlock(text: 'Non disponibile');
+    }
+  }
 
   factory ContentData.fromService(Map<String, dynamic> map) {
     return ContentData(
@@ -92,26 +132,28 @@ class ContentData {
       map['id'] ?? '',
       map['name'] ?? '',
       map['text'] ?? '',
-      map[InputData.jsonProperty] != null ? InputData.fromService(map[InputData.jsonProperty]) : null,
+      map['input'] != null ? map['input'] : {},
+      map['tool_use_id'] ?? '',
+      map['content'] ?? '',
     );
   }
 }
 
-class InputData {
-  static const String jsonProperty = 'input';
+// class InputData {
+//   static const String jsonProperty = 'input';
 
-  final Map<String, dynamic> arguments;
+//   final Map<String, dynamic> arguments;
 
-  InputData(
-    this.arguments,
-  );
+//   InputData(
+//     this.arguments,
+//   );
 
-  factory InputData.fromService(Map<String, dynamic> map) {
-    return InputData(
-      map['arguments'] != null ? jsonDecode(map['arguments']) : {},
-    );
-  }
-}
+//   factory InputData.fromService(Map<String, dynamic> map) {
+//     return InputData(
+//       map['arguments'] != null ? jsonDecode(map['arguments']) : {},
+//     );
+//   }
+// }
 
 class UsageData {
   static const String jsonProperty = 'usage';

@@ -33,6 +33,9 @@ class AthropicService {
         final data = jsonDecode(response) as Map<String, dynamic>;
         PackageUtils.writeConsoleLog(LogType.info, '$_tag/sendRequest', 'Data: $data');
         final serviceResponse = CompletionResponseDto.fromService(data);
+        if (serviceResponse.error != null) {
+          return GenericResponse(false, message: '${serviceResponse.error!.type} - ${serviceResponse.error!.message}');
+        }
         return GenericResponse(true, object: serviceResponse);
       }
 
