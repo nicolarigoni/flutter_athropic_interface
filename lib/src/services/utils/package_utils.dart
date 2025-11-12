@@ -15,7 +15,7 @@ enum LogType {
 }
 
 class PackageUtils {
-  static final _dateFormat = DateFormat('yyyy-MM-dd hh:mm');
+  static final _dateFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
 
   static const Duration serviceTimeout = Duration(minutes: 2);
 

@@ -104,7 +104,7 @@ class ToolGenerator extends GeneratorForAnnotation<ToolDefinition> {
         if (ann != null && ann.type.toString() == 'ToolField') {
           final reader = ConstantReader(ann);
           if (!reader.read('description').isNull) {
-            description = _escapeString(reader.read('description').stringValue);
+            description = reader.read('description').stringValue; //_escapeString(reader.read('description').stringValue);
           }
           if (!reader.read('isRequired').isNull) {
             isRequired = reader.read('isRequired').boolValue;
@@ -157,7 +157,7 @@ class ToolGenerator extends GeneratorForAnnotation<ToolDefinition> {
         final DartType fieldType = field.type;
 
         final fieldReader = ConstantReader(fieldAnnotation);
-        final description = _escapeString(fieldReader.read('description').stringValue);
+        final description = fieldReader.read('description').stringValue; //_escapeString(fieldReader.read('description').stringValue);
         final isRequired = fieldReader.read('isRequired').boolValue;
 
         final fieldSchema = _schemaForDartType(field.type, description: description);
@@ -208,11 +208,6 @@ class ToolGenerator extends GeneratorForAnnotation<ToolDefinition> {
     // Genera il file .g.dart
     final className = element.name;
     final buffer = StringBuffer();
-
-    String _nullableToDoubleSuffix() {
-      // converte num? a double? gestendo null
-      return " == null ? null : (json['\$snakeName'] as num).toDouble()";
-    }
 
     bool _isDartCoreClass(ClassElement ce) {
       final lib = ce.library;

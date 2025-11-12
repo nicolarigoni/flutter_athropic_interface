@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_athropic_interface/src/models/content_type.dart';
 import 'package:flutter_athropic_interface/src/services/utils/package_utils.dart';
 
@@ -124,7 +126,7 @@ class ToolResultBlock extends Block {
     return {
       'type': type.jsonProperty,
       'tool_use_id': toolUseId,
-      'content': content,
+      'content': jsonEncode(content),
     };
   }
 }

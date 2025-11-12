@@ -19,15 +19,16 @@ class AthropicService {
       final Request request = Configuration.getUrlAnthropic(_endPoint);
 
       final now = DateTime.now();
+      final formattedDate = PackageUtils.formatDate(now).replaceAll('/', '-');
       final jsonEncoder = JsonEncoder.withIndent('  ');
       final prettyBody = jsonEncoder.convert(messageRequest.toJson());
-      await PackageUtils.writeLogToFile(logFileName: PackageUtils.logFileName('body_${PackageUtils.formatDate(now)}'), log: prettyBody);
+      await PackageUtils.writeLogToFile(logFileName: PackageUtils.logFileName('body_${formattedDate}'), log: prettyBody);
 
       request.body = jsonEncode(messageRequest.toJson());
       final StreamedResponse streamedResponse = await request.send().timeout(PackageUtils.serviceTimeout);
       final response = await streamedResponse.stream.bytesToString();
 
-      await PackageUtils.writeLogToFile(logFileName: PackageUtils.logFileName('response_${PackageUtils.formatDate(now)}'), log: response);
+      await PackageUtils.writeLogToFile(logFileName: PackageUtils.logFileName('response_${formattedDate}'), log: response);
 
       if (streamedResponse.statusCode == 200) {
         final data = jsonDecode(response) as Map<String, dynamic>;
