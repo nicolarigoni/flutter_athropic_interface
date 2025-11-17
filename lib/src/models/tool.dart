@@ -1,7 +1,8 @@
 
 
 enum ToolType {
-  custom('custom');
+  custom('custom'),
+  codeExecution('code_execution_20250825');
 
   final String jsonProperty;
 
@@ -28,6 +29,8 @@ abstract class Tool {
     switch (type) {
       case ToolType.custom:
         return CustomTool.fromJson(map);
+      case ToolType.codeExecution:
+        return CodeExecutionTool.fromJson(map);
     }
   }
 }
@@ -55,10 +58,37 @@ class CustomTool extends Tool {
   @override
   Map<String, dynamic> toJson() {
     return {
-      'type': type.name,
+      'type': type.jsonProperty,
       'name': name,
       if (description != null) 'description': description,
       'input_schema': inputSchema,
+    };
+  }
+}
+
+class CodeExecutionTool extends Tool {
+  @override
+  final ToolType type;
+  @override
+  final String name;
+  @override
+  final String? description = '';
+  @override
+  final Map<String, dynamic> inputSchema = {};
+
+  CodeExecutionTool({String? name}) : type = ToolType.codeExecution, name = name ?? 'code_execution';
+
+  factory CodeExecutionTool.fromJson(Map<String, dynamic> json) {
+    return CodeExecutionTool(
+      name: json['name'],
+    );
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return {
+      'type': type.jsonProperty,
+      'name': name,
     };
   }
 }

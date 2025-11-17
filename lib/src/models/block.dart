@@ -17,6 +17,9 @@ abstract class Block {
         return TextBlock(text: map['text']);
       case ContentType.image:
         return ImageBlock(base64Source: '');
+      case ContentType.document:
+        final fileId = map['source']['file_id'] ?? '';
+        return DocumentBlock(fileId: fileId);
       case ContentType.toolUse:
         return ToolUseBlock(
           id: map['id'],
@@ -33,6 +36,8 @@ abstract class Block {
           toolUseId: map['tool_use_id'],
           content: map['content'],
         );
+      case ContentType.containerUpload:
+        return ContainerUploadBlock(fileId: '');
       default:
         PackageUtils.writeConsoleLog(LogType.error, 'Block', 'ContentType: ${type.name} non implementato');
         return TextBlock(text: '');
@@ -61,6 +66,40 @@ class ImageBlock extends Block {
     required String base64Source,
   })  : source = {'type': 'base64', 'media_type': 'image/jpeg', 'data': base64Source},
         super(ContentType.image);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return {
+      'type': type.jsonProperty,
+      'source': source,
+    };
+  }
+}
+
+// class DocumentBlock extends Block {
+//   final Map<String, String> source;
+
+//   DocumentBlock({
+//     required String base64Source,
+//   })  : source = {'type': 'base64', 'media_type': 'application/json', 'data': base64Source},
+//         super(ContentType.document);
+
+//   @override
+//   Map<String, dynamic> toJson() {
+//     return {
+//       'type': type.jsonProperty,
+//       'source': source,
+//     };
+//   }
+// }
+
+class DocumentBlock extends Block {
+  final Map<String, dynamic> source;
+
+  DocumentBlock({
+    required String fileId,
+  })  : source = {'type': 'file', 'file_id': fileId},
+        super(ContentType.document);
 
   @override
   Map<String, dynamic> toJson() {
@@ -127,6 +166,22 @@ class ToolResultBlock extends Block {
       'type': type.jsonProperty,
       'tool_use_id': toolUseId,
       'content': jsonEncode(content),
+    };
+  }
+}
+
+class ContainerUploadBlock extends Block {
+  final String fileId;
+
+  ContainerUploadBlock({
+    required this.fileId,
+  }) : super(ContentType.containerUpload);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return {
+      'type': type.jsonProperty,
+      'file_id': fileId,
     };
   }
 }

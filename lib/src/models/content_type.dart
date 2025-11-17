@@ -4,7 +4,8 @@ enum ContentType {
   document('document'),
   thinking('thinking'),
   toolUse('tool_use'),
-  toolResult('tool_result');
+  toolResult('tool_result'),
+  containerUpload('container_upload');
 
   final String jsonProperty;
 
